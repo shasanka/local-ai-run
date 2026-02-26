@@ -11,7 +11,7 @@ local-ai-run/
 
 ### Getting Started
 
-**Prerequisites**
+**Prerequisites:**
 
 - Node.js (v24 recommended)
 - Yarn (preferred package manager)
@@ -29,53 +29,70 @@ yarn install
 yarn dev
 ```
 
-The backend handles session logic, chat history management, and acts as the
-bridge to the Hugging Face inference engine.
+**The backend:**
 
-### Frontend Setup (React + Vite)
+- Manages sessions
+- Maintains chat history in memory
+- Interfaces with Hugging Face Transformers.js for local model inference
 
-The frontend is isolated in its own directory:
+### 💻 Frontend Setup (React + Vite)
 
-Bash
+The frontend is isolated inside the frontend/ directory.
 
-# Navigate to frontend folder
+```
+cd frontend
+yarn install
+yarn dev
+```
 
-cd frontend yarn install yarn dev
+The UI will start on the default Vite development port.
 
-### Technical Details
+## Language
 
-Language: 100% TypeScript. This allows for shared interfaces between the
-frontend and backend, ensuring the Message and ChatMetadata types are consistent
-across the network.
+- 100% TypeScript
+- Shared types between frontend and backend
+- Consistent Message and ChatMetadata interfaces across network boundaries
 
-Inference: Utilizing local Hugging Face models.
+## Inference
 
-Storage: Currently Non-Persistent.
+- Local Hugging Face models
+- No external API calls
+- Inference handled by the Node.js backend
 
-Data is stored in-memory on the backend and via sessionStorage on the frontend.
+## Storage
 
-Note: Restarting the backend server will clear current chat histories as no
-database is integrated yet.
+- Backend: In-memory storage
+- Frontend: sessionStorage
+- No database (yet)
 
-UI Features:
+⚠ Restarting the backend will clear all chat history.
 
-Custom Markdown rendering with "soft-dark" slate themes.
+### 🎨 UI Features
 
-Target-locked message sending (prevents messages from appearing in the wrong
-chat when switching quickly).
+- Custom Markdown rendering *Soft-dark slate-themed interface *Styled code block
+  cards with custom [&_pre] overrides *Auto-focus on textarea when creating a
+  new chat Target-locked message dispatching to prevent race conditions when
+  switching chats
 
-Auto-focusing textarea on "New Chat" creation.
-
-### Key Functionalities
+### ⚙ Key Functionalities
 
 Feature	Implementation Backend	Node.js / TypeScript / Hugging Face SDK
 Frontend	React / Tailwind CSS / Vite Styling	Custom Code Block cards with
 [&_pre] overrides State	Multi-chat ID locking to prevent race conditions
 
-### Roadmap
+| Layer      | Technology                                          |
+| ---------- | --------------------------------------------------- |
+| Backend    | Node.js, TypeScript, Hugging Face Transformers.js   |
+| Frontend   | React, Vite, Tailwind CSS                           |
+| Styling    | Custom Markdown + Code Block Components             |
+| State Mgmt | Multi-chat ID locking to prevent concurrency issues |
 
-[ ] Integrate SQLite or MongoDB for persistent history.
+### 🛣 Roadmap
 
-[ ] Add support for multiple Hugging Face model switching in the UI.
+Add SQLite or MongoDB for persistent chat history
 
-[ ] Implementation of a "Stop Generation" signal for the Node.js backend.
+Support multiple model selection from the UI
+
+Implement "Stop Generation" signal for backend inference
+
+Improve GPU compatibility and inference fallbacks
