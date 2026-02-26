@@ -39,7 +39,7 @@ const App = () => {
     return id;
   });
 
-  const isCurrentChatLoading = loadingChatId === activeChatId;
+  const isCurrentChatLoading = activeChatId ? loadingChatId === activeChatId : false;
 
   const fetchChatList = async () => {
     try {
@@ -80,17 +80,26 @@ const App = () => {
   };
   // 5. Send Message (Updated for Multi-Chat)
   const sendMessage = async (text: string) => {
-    // Lock the ID for this specific execution closure
-    const targetChatId = activeChatId || `chat-${Date.now()}`;
+    if (!text.trim()) return;
 
-    if (!activeChatId) {
+    // 1. Determine the ID. If null, we are starting a "Zero-Click" chat.
+    let targetChatId = activeChatId;
+
+    if (!targetChatId) {
+      targetChatId = `chat-${Date.now()}`;
+      const placeholderChat: ChatMetadata = { id: targetChatId, title: "New Conversation" };
+
+      // Update sidebar and set as active BEFORE the fetch
+      setChatList(prev => [placeholderChat, ...prev]);
       setActiveChatId(targetChatId);
+
+      // Pre-populate the message list so the user sees their prompt immediately
+      setMessages([{ role: 'user', content: text }]);
+    } else {
+      // Normal flow for existing chats
+      const userMsg: Message = { role: 'user', content: text };
+      setMessages(prev => [...prev, userMsg]);
     }
-
-    const userMsg: Message = { role: 'user', content: text };
-
-    // Only update UI if the user is still looking at the target chat
-    setMessages(prev => (activeChatId === targetChatId ? [...prev, userMsg] : prev));
 
     setLoadingChatId(targetChatId);
 
@@ -98,13 +107,17 @@ const App = () => {
       const response = await fetch('http://localhost:5000/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, sessionId, chatId: targetChatId })
+        body: JSON.stringify({
+          prompt: text,
+          sessionId,
+          chatId: targetChatId
+        })
       });
 
       const data = await response.json();
 
-      // IMPORTANT: Only update main state if the user hasn't switched away
       setActiveChatId(currentId => {
+        // Only update if the user is still viewing the chat they just messaged in
         if (currentId === targetChatId) {
           setMessages(data.history);
           setContextCount(data.contextCount);
@@ -113,11 +126,10 @@ const App = () => {
         return currentId;
       });
 
-      fetchChatList();
+      fetchChatList(); // Refresh sidebar to get generated titles
     } catch (err) {
-      console.error(err);
+      console.error("Failed to send:", err);
     } finally {
-      // Clear loading specifically for this chat
       setLoadingChatId(current => current === targetChatId ? null : current);
     }
   };
@@ -189,6 +201,8 @@ const App = () => {
 
     fetchHistory();
   }, [activeChatId, sessionId]);
+
+
 
   const resetHistory = async () => {
     if (!activeChatId) return;
@@ -329,8 +343,10 @@ const App = () => {
         <footer className="w-full border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0d1117] p-4">
           <div className="max-w-4xl mx-auto">
             <ChatInput
-              ref={inputRef} // Pass the ref here
+              ref={inputRef}
               onSend={sendMessage}
+              // REMOVE: !activeChatId from here
+              // ONLY disable if the current view is waiting for a response
               disabled={isCurrentChatLoading}
             />
           </div>
