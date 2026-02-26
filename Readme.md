@@ -1,4 +1,4 @@
-### Project Architecture
+### 🏗 Project Architecture
 
 ```
 local-ai-run/
@@ -9,7 +9,7 @@ local-ai-run/
 └── tsconfig.json          # Shared TypeScript configuration
 ```
 
-### Getting Started
+### 🚀 Getting Started
 
 **Prerequisites:**
 
@@ -18,7 +18,7 @@ local-ai-run/
 - A machine capable of running Hugging Face models locally\
   (Ensure required ONNX/DirectML/CPU support depending on your setup)
 
-### Backend Setup (Node.js + TypeScript)
+### 🔧 Backend Setup (Node.js + TypeScript)
 
 The backend is located in the root src/ directory.
 
@@ -76,10 +76,6 @@ The UI will start on the default Vite development port.
 
 ### ⚙ Key Functionalities
 
-Feature	Implementation Backend	Node.js / TypeScript / Hugging Face SDK
-Frontend	React / Tailwind CSS / Vite Styling	Custom Code Block cards with
-[&_pre] overrides State	Multi-chat ID locking to prevent race conditions
-
 | Layer      | Technology                                          |
 | ---------- | --------------------------------------------------- |
 | Backend    | Node.js, TypeScript, Hugging Face Transformers.js   |
@@ -89,10 +85,7 @@ Frontend	React / Tailwind CSS / Vite Styling	Custom Code Block cards with
 
 ### 🛣 Roadmap
 
-Add SQLite or MongoDB for persistent chat history
-
-Support multiple model selection from the UI
-
-Implement "Stop Generation" signal for backend inference
-
-Improve GPU compatibility and inference fallbacks
+- [ ] Add SQLite or MongoDB for persistent chat history
+- [ ] Support multiple model selection from the UI
+- [ ] Implement "Stop Generation" signal for backend inference
+- [ ] Improve GPU compatibility and inference fallbacks
