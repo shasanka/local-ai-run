@@ -1,8 +1,13 @@
 ### Project Architecture
 
-├── frontend/ # React + Vite + TypeScript (The UI) └── src/ # Node.js +
-TypeScript (The Backend API) ├── package.json # Root config for backend
-execution └── tsconfig.json # Shared TypeScript configuration
+```
+local-ai-run/
+├── frontend/              # React + Vite + TypeScript (UI)
+│   └── src/
+├── src/                   # Node.js + TypeScript (Backend API)
+├── package.json           # Root backend configuration
+└── tsconfig.json          # Shared TypeScript configuration
+```
 
 ### Getting Started
 
