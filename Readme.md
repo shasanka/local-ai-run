@@ -2,12 +2,34 @@
 
 ```
 local-ai-run/
-├── frontend/              # React + Vite + TypeScript (UI)
-│   └── src/
-├── src/                   # Node.js + TypeScript (Backend API)
-├── package.json           # Root backend configuration
-└── tsconfig.json          # Shared TypeScript configuration
+├── src/                     # Node.js + TypeScript (Backend API)
+│   └── ...
+├── package.json             # Backend configuration
+├── tsconfig.json            # Backend TypeScript config
+│
+└── frontend/                # React + Vite + TypeScript (UI)
+    ├── src/
+    ├── package.json         # Frontend dependencies
+    ├── tsconfig.json        # Frontend TypeScript config
+    ├── vite.config.ts
+    └── ...
 ```
+
+### Architecture Clarification
+
+**Backend (root)**
+
+- Node.js + TypeScript
+- Runs local Hugging Face models
+- Manages sessions and chat history
+- Has its own package.json and tsconfig.json
+
+**Frontend (/frontend)**
+
+- React + Vite + TypeScript
+- Fully isolated build setup
+- Separate package.json
+- Separate tsconfig.json
 
 ## 🚀 Getting Started
 
