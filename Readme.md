@@ -11,23 +11,26 @@ local-ai-run/
 
 ### Getting Started
 
-1. Prerequisites Node.js (v24)
+**Prerequisites**
 
-Yarn (Preferred package manager)
-
-Access to Hugging Face models (ensure your local environment supports the
-required tensors/libraries for the model you choose).
+- Node.js (v24 recommended)
+- Yarn (preferred package manager)
+- A machine capable of running Hugging Face models locally\
+  (Ensure required ONNX/DirectML/CPU support depending on your setup)
 
 ### Backend Setup (Node.js + TypeScript)
 
-The backend lives in the src folder at the root. To run it:
+The backend is located in the root src/ directory.
 
-Bash
+From the root of the project:
 
-# Stay in the root directory
+```
+yarn install 
+yarn dev
+```
 
-yarn install yarn dev The backend handles session logic, chat history
-management, and acts as the bridge to the Hugging Face inference engine.
+The backend handles session logic, chat history management, and acts as the
+bridge to the Hugging Face inference engine.
 
 ### Frontend Setup (React + Vite)
 
