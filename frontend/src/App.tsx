@@ -22,7 +22,7 @@ const App = () => {
   const [tokenCount, setTokenCount] = useState(0);
 
   // To this:
-  const [loadingChatId, setLoadingChatId] = useState<string | null>(null);
+  const [loadingChatIds, setLoadingChatIds] = useState<Set<string>>(new Set());
   const TOKEN_LIMIT = 2048;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null); // Create the ref
@@ -39,7 +39,7 @@ const App = () => {
     return id;
   });
 
-  const isCurrentChatLoading = activeChatId ? loadingChatId === activeChatId : false;
+  const isCurrentChatLoading = activeChatId ? loadingChatIds.has(activeChatId) : false;
 
   const fetchChatList = async () => {
     try {
@@ -89,24 +89,19 @@ const App = () => {
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
 
-    // 1. Capture the ID we are targeting
+    // 1. Determine if this is a fresh start
     const isNewChat = !activeChatId;
     const targetChatId = activeChatId || `chat-${Date.now()}`;
 
-    // 2. Immediate UI Update: Move/Add chat to the TOP of the list
+    // 2. Update Sidebar Order Immediately
     setChatList(prev => {
       const existing = prev.find(c => c.id === targetChatId);
       const others = prev.filter(c => c.id !== targetChatId);
-
-      // If it's new, we use a placeholder title; if existing, we keep the old title
-      const updatedChat = existing
-        ? existing
-        : { id: targetChatId, title: "New Conversation" };
-
+      const updatedChat = existing || { id: targetChatId, title: "New Conversation" };
       return [updatedChat, ...others];
     });
 
-    // 3. Update Active States
+    // 3. Use 'isNewChat' to handle state transitions
     if (isNewChat) {
       setActiveChatId(targetChatId);
       setMessages([{ role: 'user', content: text }]);
@@ -114,7 +109,8 @@ const App = () => {
       setMessages(prev => [...prev, { role: 'user', content: text }]);
     }
 
-    setLoadingChatId(targetChatId);
+    // 4. Track loading state for THIS specific ID
+    setLoadingChatIds(prev => new Set(prev).add(targetChatId));
 
     try {
       const response = await fetch('http://localhost:5000/ask', {
@@ -129,7 +125,7 @@ const App = () => {
 
       const data = await response.json();
 
-      // 4. Update messages only if the user hasn't switched away
+      // 5. Only update message bubbles if the user is currently looking at this chat
       setActiveChatId(currentId => {
         if (currentId === targetChatId) {
           setMessages(data.history);
@@ -139,12 +135,16 @@ const App = () => {
         return currentId;
       });
 
-      // 5. Sync with server to get the real generated title
       fetchChatList();
     } catch (err) {
       console.error("Failed to send:", err);
     } finally {
-      setLoadingChatId(current => current === targetChatId ? null : current);
+      // 6. Remove this specific ID from the loading set
+      setLoadingChatIds(prev => {
+        const next = new Set(prev);
+        next.delete(targetChatId);
+        return next;
+      });
     }
   };
 
@@ -185,7 +185,7 @@ const App = () => {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loadingChatId]);
+  }, [messages, loadingChatIds]);
 
   useEffect(() => {
     console.log("🚀 ~ App ~ sessionId:", sessionId)
@@ -326,7 +326,7 @@ const App = () => {
         </header>
 
         {/* Main Messages Area */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="max-w-4xl mx-auto px-4 pt-8 pb-32">
             {activeChatId ? (
               <>
