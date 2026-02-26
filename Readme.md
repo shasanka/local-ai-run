@@ -89,10 +89,12 @@ The UI will start on the default Vite development port.
 
 ## 🎨 UI Features
 
-- Custom Markdown rendering *Soft-dark slate-themed interface *Styled code block
-  cards with custom [&_pre] overrides *Auto-focus on textarea when creating a
-  new chat Target-locked message dispatching to prevent race conditions when
-  switching chats
+- Custom Markdown rendering
+- Soft-dark slate-themed interface
+- Styled code block cards with custom [&_pre] overrides
+- Auto-focus on textarea when creating a new chat
+- Target-locked message dispatching to prevent race conditions when switching
+  chats
 
 ## ⚙ Key Functionalities
 
