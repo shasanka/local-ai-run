@@ -72,8 +72,6 @@ The UI will start on the default Vite development port.
 ### Language
 
 - 100% TypeScript
-- Shared types between frontend and backend
-- Consistent Message and ChatMetadata interfaces across network boundaries
 
 ### Inference
 
