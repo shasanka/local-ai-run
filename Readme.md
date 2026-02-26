@@ -1,4 +1,4 @@
-### 🏗 Project Architecture
+## 🏗 Project Architecture
 
 ```
 local-ai-run/
@@ -9,7 +9,7 @@ local-ai-run/
 └── tsconfig.json          # Shared TypeScript configuration
 ```
 
-### 🚀 Getting Started
+## 🚀 Getting Started
 
 **Prerequisites:**
 
@@ -18,7 +18,7 @@ local-ai-run/
 - A machine capable of running Hugging Face models locally\
   (Ensure required ONNX/DirectML/CPU support depending on your setup)
 
-### 🔧 Backend Setup (Node.js + TypeScript)
+## 🔧 Backend Setup (Node.js + TypeScript)
 
 The backend is located in the root src/ directory.
 
@@ -35,7 +35,7 @@ yarn dev
 - Maintains chat history in memory
 - Interfaces with Hugging Face Transformers.js for local model inference
 
-### 💻 Frontend Setup (React + Vite)
+## 💻 Frontend Setup (React + Vite)
 
 The frontend is isolated inside the frontend/ directory.
 
@@ -47,19 +47,19 @@ yarn dev
 
 The UI will start on the default Vite development port.
 
-## Language
+### Language
 
 - 100% TypeScript
 - Shared types between frontend and backend
 - Consistent Message and ChatMetadata interfaces across network boundaries
 
-## Inference
+### Inference
 
 - Local Hugging Face models
 - No external API calls
 - Inference handled by the Node.js backend
 
-## Storage
+### Storage
 
 - Backend: In-memory storage
 - Frontend: sessionStorage
@@ -67,14 +67,14 @@ The UI will start on the default Vite development port.
 
 ⚠ Restarting the backend will clear all chat history.
 
-### 🎨 UI Features
+## 🎨 UI Features
 
 - Custom Markdown rendering *Soft-dark slate-themed interface *Styled code block
   cards with custom [&_pre] overrides *Auto-focus on textarea when creating a
   new chat Target-locked message dispatching to prevent race conditions when
   switching chats
 
-### ⚙ Key Functionalities
+## ⚙ Key Functionalities
 
 | Layer      | Technology                                          |
 | ---------- | --------------------------------------------------- |
@@ -83,7 +83,7 @@ The UI will start on the default Vite development port.
 | Styling    | Custom Markdown + Code Block Components             |
 | State Mgmt | Multi-chat ID locking to prevent concurrency issues |
 
-### 🛣 Roadmap
+## 🛣 Roadmap
 
 - [ ] Add SQLite or MongoDB for persistent chat history
 - [ ] Support multiple model selection from the UI
