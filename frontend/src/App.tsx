@@ -44,11 +44,16 @@ const App = () => {
   const fetchChatList = async () => {
     try {
       const res = await fetch(`http://localhost:5000/sessions/${sessionId}/chats`);
-      const serverChats = await res.json();
+      let serverChats = await res.json();
+
+      // Sort by ID descending (assuming IDs are 'chat-timestamp')
+      serverChats.sort((a: any, b: any) => b.id.localeCompare(a.id));
 
       setChatList(prev => {
         const hasEmptyChat = prev.find(c => c.title === "Empty Chat" && c.id === activeChatId);
+
         if (hasEmptyChat && !serverChats.find((sc: any) => sc.id === activeChatId)) {
+          // Keep the placeholder at the absolute top
           return [hasEmptyChat, ...serverChats];
         }
         return serverChats;
@@ -68,6 +73,8 @@ const App = () => {
   const startNewChat = () => {
     const newId = `chat-${Date.now()}`;
     const placeholderChat: ChatMetadata = { id: newId, title: "Empty Chat" };
+
+    // Prepend to the list so it appears at the top
     setChatList(prev => [placeholderChat, ...prev]);
     setActiveChatId(newId);
     setMessages([]);
@@ -82,23 +89,29 @@ const App = () => {
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
 
-    // 1. Determine the ID. If null, we are starting a "Zero-Click" chat.
-    let targetChatId = activeChatId;
+    // 1. Capture the ID we are targeting
+    const isNewChat = !activeChatId;
+    const targetChatId = activeChatId || `chat-${Date.now()}`;
 
-    if (!targetChatId) {
-      targetChatId = `chat-${Date.now()}`;
-      const placeholderChat: ChatMetadata = { id: targetChatId, title: "New Conversation" };
+    // 2. Immediate UI Update: Move/Add chat to the TOP of the list
+    setChatList(prev => {
+      const existing = prev.find(c => c.id === targetChatId);
+      const others = prev.filter(c => c.id !== targetChatId);
 
-      // Update sidebar and set as active BEFORE the fetch
-      setChatList(prev => [placeholderChat, ...prev]);
+      // If it's new, we use a placeholder title; if existing, we keep the old title
+      const updatedChat = existing
+        ? existing
+        : { id: targetChatId, title: "New Conversation" };
+
+      return [updatedChat, ...others];
+    });
+
+    // 3. Update Active States
+    if (isNewChat) {
       setActiveChatId(targetChatId);
-
-      // Pre-populate the message list so the user sees their prompt immediately
       setMessages([{ role: 'user', content: text }]);
     } else {
-      // Normal flow for existing chats
-      const userMsg: Message = { role: 'user', content: text };
-      setMessages(prev => [...prev, userMsg]);
+      setMessages(prev => [...prev, { role: 'user', content: text }]);
     }
 
     setLoadingChatId(targetChatId);
@@ -116,8 +129,8 @@ const App = () => {
 
       const data = await response.json();
 
+      // 4. Update messages only if the user hasn't switched away
       setActiveChatId(currentId => {
-        // Only update if the user is still viewing the chat they just messaged in
         if (currentId === targetChatId) {
           setMessages(data.history);
           setContextCount(data.contextCount);
@@ -126,7 +139,8 @@ const App = () => {
         return currentId;
       });
 
-      fetchChatList(); // Refresh sidebar to get generated titles
+      // 5. Sync with server to get the real generated title
+      fetchChatList();
     } catch (err) {
       console.error("Failed to send:", err);
     } finally {
