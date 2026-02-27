@@ -3,6 +3,8 @@ import ChatInput from './component/ChatInput';
 import { MessageRow } from './component/MessageRow';
 import Sidebar from './component/Sidebar';
 import SettingsModal from './component/SettingsModal';
+import toast from 'react-hot-toast';
+import { API_ENDPOINTS } from './config/api';
 
 // 1. Define types clearly
 type Role = "user" | "assistant" | "system";
@@ -49,7 +51,7 @@ const App = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/settings/${sessionId}`);
+        const res = await fetch(API_ENDPOINTS.SETTINGS.GET(sessionId));
         const data = await res.json();
         console.log("🚀 ~ fetchSettings ~ data:", data)
         setSystemPrompt(data.systemPrompt);
@@ -62,7 +64,9 @@ const App = () => {
 
   const fetchChatList = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/sessions/${sessionId}/chats`);
+      const res = await fetch(
+        API_ENDPOINTS.CHAT.HISTORY(sessionId)
+      );
       let serverChats = await res.json();
 
       // Sort by ID descending (assuming IDs are 'chat-timestamp')
@@ -132,7 +136,7 @@ const App = () => {
     setLoadingChatIds(prev => new Set(prev).add(targetChatId));
 
     try {
-      const response = await fetch('http://localhost:5000/ask', {
+      const response = await fetch(API_ENDPOINTS.CHAT.ASK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -172,7 +176,7 @@ const App = () => {
     if (!window.confirm("Delete this conversation?")) return;
 
     try {
-      const response = await fetch('http://localhost:5000/delete-chat', {
+      const response = await fetch(API_ENDPOINTS.CHAT.DELETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, chatId: cid })
@@ -196,18 +200,24 @@ const App = () => {
   };
 
   const saveSettings = async (newPrompt: string) => {
+    const loadingToast = toast.loading('Saving settings...');
     try {
-      const res = await fetch('http://localhost:5000/settings', {
+      const res = await fetch(API_ENDPOINTS.SETTINGS.BASE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, systemPrompt: newPrompt })
       });
       if (res.ok) {
         setSystemPrompt(newPrompt);
-        setIsSettingsOpen(false);
+        toast.success('Personality updated!', { id: loadingToast });
+        setSystemPrompt(newPrompt);
+        // setIsSettingsOpen(false);
         // Optional: toast notification for success
       }
-    } catch (e) { console.error("Save failed", e); }
+    } catch (e) {
+      toast.error('Failed to save settings', { id: loadingToast });
+      console.error("Save failed", e);
+    }
   };
 
   // --- THEME & SCROLL LOGIC ---
@@ -236,7 +246,7 @@ const App = () => {
 
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/session/${sessionId}/${activeChatId}`);
+        const res = await fetch(API_ENDPOINTS.CHAT.SESSION(sessionId, activeChatId));
         const data = await res.json();
         console.log("🚀 ~ fetchHistory ~ data:", data)
         setMessages(data.history);
@@ -261,7 +271,7 @@ const App = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/reset-chat', {
+      const response = await fetch(API_ENDPOINTS.CHAT.RESET, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, chatId: activeChatId })
