@@ -108,7 +108,7 @@ The UI will start on the default Vite development port.
 ## 🛣 Roadmap
 
 - [x] Functionality to set personality for a session
-- [ ] Create seperate routes in backend
+- [ ] Create separate routes in backend
 - [ ] Add SQLite or MongoDB for persistent chat history
 - [ ] Support multiple model selection from the UI
 - [ ] Implement "Stop Generation" signal for backend inference
