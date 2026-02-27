@@ -4,7 +4,7 @@ import { pipeline, type TextGenerationOutput } from '@huggingface/transformers';
 
 let pipe: any = null;
 
-// const GENERAL_MODEL = "onnx-community/Qwen2.5-0.5B-Instruct"
+const GENERAL_MODEL = "onnx-community/Qwen2.5-0.5B-Instruct"
 const CODER_MODEL = "onnx-community/Qwen2.5-Coder-0.5B-Instruct"
 const TYPE = "text-generation"
 
