@@ -1,14 +1,12 @@
 import {
     pipeline,
-    type PipelineType,
+    // type PipelineType,
     type TextGenerationPipeline,
     type TextGenerationOutput
 } from "@huggingface/transformers";
+import { Message } from "./Utils/types.ts";
 
-export interface Message {
-    role: 'system' | 'user' | 'assistant';
-    content: string;
-}
+
 
 let pipe: TextGenerationPipeline | null = null;
 
@@ -40,17 +38,3 @@ export async function chatStep(history: Message[]): Promise<Message[]> {
     return output[0].generated_text as Message[];
 }
 
-// Initialize with proper typing
-// let myChat: Message[] = [
-//     { role: "user", content: "Hi, my name is Shasanka. Tell me a Typescript fact." }
-// ];
-
-// // Round 1
-// myChat = await chatStep(myChat);
-// console.log("AI:", myChat.at(-1)?.content);
-
-// // Round 2
-// myChat.push({ role: "user", content: "What is my name?" });
-// myChat = await chatStep(myChat);
-// console.log("AI:", myChat.at(-1)?.content);
-// console.log("🚀 ~ myChat:", myChat)
