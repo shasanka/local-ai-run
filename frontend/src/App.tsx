@@ -62,7 +62,7 @@ const App = () => {
 
   const fetchChatList = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/sessions/${sessionId}/chats`);
+      const res = await fetch(`http://localhost:5000/chat/sessions/${sessionId}/chats`);
       let serverChats = await res.json();
 
       // Sort by ID descending (assuming IDs are 'chat-timestamp')
@@ -132,7 +132,7 @@ const App = () => {
     setLoadingChatIds(prev => new Set(prev).add(targetChatId));
 
     try {
-      const response = await fetch('http://localhost:5000/ask', {
+      const response = await fetch('http://localhost:5000/chat/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -172,7 +172,7 @@ const App = () => {
     if (!window.confirm("Delete this conversation?")) return;
 
     try {
-      const response = await fetch('http://localhost:5000/delete-chat', {
+      const response = await fetch('http://localhost:5000/chat/delete-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, chatId: cid })
@@ -236,7 +236,7 @@ const App = () => {
 
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/session/${sessionId}/${activeChatId}`);
+        const res = await fetch(`http://localhost:5000/chat/session/${sessionId}/${activeChatId}`);
         const data = await res.json();
         console.log("🚀 ~ fetchHistory ~ data:", data)
         setMessages(data.history);
@@ -261,7 +261,7 @@ const App = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/reset-chat', {
+      const response = await fetch('http://localhost:5000/chat/reset-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, chatId: activeChatId })
