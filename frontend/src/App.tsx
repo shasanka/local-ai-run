@@ -3,6 +3,7 @@ import ChatInput from './component/ChatInput';
 import { MessageRow } from './component/MessageRow';
 import Sidebar from './component/Sidebar';
 import SettingsModal from './component/SettingsModal';
+import toast from 'react-hot-toast';
 
 // 1. Define types clearly
 type Role = "user" | "assistant" | "system";
@@ -196,6 +197,7 @@ const App = () => {
   };
 
   const saveSettings = async (newPrompt: string) => {
+    const loadingToast = toast.loading('Saving settings...');
     try {
       const res = await fetch('http://localhost:5000/settings', {
         method: 'POST',
@@ -204,10 +206,15 @@ const App = () => {
       });
       if (res.ok) {
         setSystemPrompt(newPrompt);
-        setIsSettingsOpen(false);
+        toast.success('Personality updated!', { id: loadingToast });
+        setSystemPrompt(newPrompt);
+        // setIsSettingsOpen(false);
         // Optional: toast notification for success
       }
-    } catch (e) { console.error("Save failed", e); }
+    } catch (e) {
+      toast.error('Failed to save settings', { id: loadingToast });
+      console.error("Save failed", e);
+    }
   };
 
   // --- THEME & SCROLL LOGIC ---
