@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, } from 'react';
 import ChatInput from './component/ChatInput';
 import { MessageRow } from './component/MessageRow';
 import Sidebar from './component/Sidebar';
+import SettingsModal from './component/SettingsModal';
 
 // 1. Define types clearly
 type Role = "user" | "assistant" | "system";
@@ -21,7 +22,9 @@ const App = () => {
   const [contextCount, setContextCount] = useState(0);
   const [tokenCount, setTokenCount] = useState(0);
 
-  // To this:
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [systemPrompt, setSystemPrompt] = useState("");
+
   const [loadingChatIds, setLoadingChatIds] = useState<Set<string>>(new Set());
   const TOKEN_LIMIT = 2048;
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -31,6 +34,8 @@ const App = () => {
   const [chatList, setChatList] = useState<ChatMetadata[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
+
+
   // 1. Session Persistence (Keep your existing tab-based logic)
   const [sessionId] = useState(() => {
     const saved = sessionStorage.getItem('chat_session_id');
@@ -38,6 +43,20 @@ const App = () => {
     sessionStorage.setItem('chat_session_id', id);
     return id;
   });
+
+
+  // Load settings on mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/settings/${sessionId}`);
+        const data = await res.json();
+        console.log("🚀 ~ fetchSettings ~ data:", data)
+        setSystemPrompt(data.systemPrompt);
+      } catch (e) { console.error("Settings load failed", e); }
+    };
+    fetchSettings();
+  }, [sessionId]);
 
   const isCurrentChatLoading = activeChatId ? loadingChatIds.has(activeChatId) : false;
 
@@ -176,6 +195,21 @@ const App = () => {
     }
   };
 
+  const saveSettings = async (newPrompt: string) => {
+    try {
+      const res = await fetch('http://localhost:5000/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, systemPrompt: newPrompt })
+      });
+      if (res.ok) {
+        setSystemPrompt(newPrompt);
+        setIsSettingsOpen(false);
+        // Optional: toast notification for success
+      }
+    } catch (e) { console.error("Save failed", e); }
+  };
+
   // --- THEME & SCROLL LOGIC ---
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') !== 'light');
   useEffect(() => {
@@ -259,6 +293,7 @@ const App = () => {
         onSelect={setActiveChatId}
         onNew={startNewChat}
         onDelete={deleteChat}
+        onOpenSettings={() => setIsSettingsOpen(true)} // Pass the opener
       />
 
       {/* 3. Main Chat Area: This replaces your original top-level div */}
@@ -351,6 +386,12 @@ const App = () => {
               </div>
             )}
           </div>
+          <SettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+            systemPrompt={systemPrompt}
+            onSave={saveSettings}
+          />
         </main>
 
         {/* Footer / Input */}
