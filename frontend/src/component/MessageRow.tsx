@@ -11,13 +11,13 @@ export const MessageRow: React.FC<{ role: string, content: string }> = ({ role, 
         <div className={`flex w-full mb-8 ${isUser ? 'justify-end' : 'justify-start'}`}>
             <div className={`flex gap-4 min-w-0 ${isUser ? 'flex-row-reverse max-w-[75%]' : 'w-full'}`}>
 
-                <div className={`w-8 h-8 rounded shrink-0 flex items-center justify-center font-bold text-[10px] text-white ${isUser ? 'bg-indigo-600' : 'bg-emerald-600'}`}>
+                <div className={`w-8 h-8 rounded shrink-0 flex items-center justify-center font-bold text-[10px] text-white ${isUser ? 'bg-zinc-500' : 'bg-emerald-600'}`}>
                     {isUser ? 'U' : 'AI'}
                 </div>
 
                 {/* Use min-w-0 to allow internal text to wrap correctly */}
                 <div className={`min-w-0 px-4 py-2 rounded-2xl ${isUser
-                    ? 'bg-indigo-600 text-white rounded-tr-none'
+                    ? 'bg-zinc-500 text-white rounded-tr-none'
                     : 'bg-transparent w-full'
                     }`}>
                     <div className={`
