@@ -11,6 +11,9 @@ router.post('/ask', (req, res) => {
     const { prompt, sessionId, chatId } = req.body;
     if (!sessionId || !chatId || !prompt) return res.status(400).json({ error: "Missing data" });
 
+    // Fetch the unified settings object (contains systemPrompt and temperature)
+    const settings = getSettings(sessionId);
+
     let userChats = sessions.get(sessionId);
     if (!userChats) {
         userChats = new Map();
@@ -19,7 +22,6 @@ router.post('/ask', (req, res) => {
 
     let thread = userChats.get(chatId);
     if (!thread) {
-        const settings = getSettings(sessionId);
         thread = {
             id: chatId,
             title: prompt.substring(0, 40) + "...",
@@ -33,7 +35,12 @@ router.post('/ask', (req, res) => {
     const taskId = `${sessionId}|${chatId}|${Date.now()}`;
     pendingRequests.set(taskId, { res, sessionId, chatId });
 
-    worker.postMessage({ history: thread.messages, taskId });
+    // Pass history and the temperature setting to the worker
+    worker.postMessage({
+        history: thread.messages,
+        taskId,
+        temperature: settings.temperature
+    });
 });
 
 // router.post('/reset-chat', (req, res) => {
