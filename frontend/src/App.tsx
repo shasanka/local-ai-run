@@ -5,6 +5,7 @@ import Sidebar from './component/Sidebar';
 import SettingsModal from './component/SettingsModal';
 import toast from 'react-hot-toast';
 import { API_ENDPOINTS } from './config/api';
+import type { ModelSettings } from './utils/datatypes';
 
 // 1. Define types clearly
 type Role = "user" | "assistant" | "system";
@@ -25,7 +26,10 @@ const App = () => {
   const [tokenCount, setTokenCount] = useState(0);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [systemPrompt, setSystemPrompt] = useState("");
+  const [settings, setSettings] = useState<ModelSettings>({
+    systemPrompt: "",
+    temperature: 0.7 // Default matching the backend
+  });
 
   const [loadingChatIds, setLoadingChatIds] = useState<Set<string>>(new Set());
   const TOKEN_LIMIT = 2048;
@@ -53,8 +57,8 @@ const App = () => {
       try {
         const res = await fetch(API_ENDPOINTS.SETTINGS.GET(sessionId));
         const data = await res.json();
-        console.log("🚀 ~ fetchSettings ~ data:", data)
-        setSystemPrompt(data.systemPrompt);
+        // Data now contains { systemPrompt, temperature }
+        setSettings(data);
       } catch (e) { console.error("Settings load failed", e); }
     };
     fetchSettings();
@@ -199,20 +203,22 @@ const App = () => {
     }
   };
 
-  const saveSettings = async (newPrompt: string) => {
+  const saveSettings = async (newSettings: ModelSettings) => {
     const loadingToast = toast.loading('Saving settings...');
     try {
       const res = await fetch(API_ENDPOINTS.SETTINGS.BASE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId, systemPrompt: newPrompt })
+        body: JSON.stringify({
+          sessionId,
+          ...newSettings // This spreads systemPrompt and temperature
+        })
       });
+
       if (res.ok) {
-        setSystemPrompt(newPrompt);
-        toast.success('Personality updated!', { id: loadingToast });
-        setSystemPrompt(newPrompt);
-        // setIsSettingsOpen(false);
-        // Optional: toast notification for success
+        const data = await res.json();
+        setSettings(data.settings); // Sync state with backend response
+        toast.success('Settings updated!', { id: loadingToast });
       }
     } catch (e) {
       toast.error('Failed to save settings', { id: loadingToast });
@@ -399,8 +405,8 @@ const App = () => {
           <SettingsModal
             isOpen={isSettingsOpen}
             onClose={() => setIsSettingsOpen(false)}
-            systemPrompt={systemPrompt}
-            onSave={saveSettings}
+            settings={settings} // Pass the whole object
+            onSave={saveSettings} // Pass the updated function
           />
         </main>
 
