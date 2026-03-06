@@ -6,6 +6,7 @@ import SettingsModal from './component/SettingsModal';
 import toast from 'react-hot-toast';
 import { API_ENDPOINTS } from './config/api';
 import type { ModelSettings } from './utils/datatypes';
+import type { FilterType } from '@shared/types';
 
 // 1. Define types clearly
 type Role = "user" | "assistant" | "system";

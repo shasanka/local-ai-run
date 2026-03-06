@@ -11,10 +11,22 @@
     "isolatedModules": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "rewriteRelativeImportExtensions": true
+    "rewriteRelativeImportExtensions": true,
+    "baseUrl": ".", // This is the "root" for your paths
+    "paths": {
+      // Mapping the folder exactly
+      "@shared/types": [
+        "shared/types.ts"
+      ],
+      // Mapping everything in the folder
+      "@shared/*": [
+        "shared/*"
+      ]
+    }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "shared/**/*"
   ],
   "exclude": [
     "node_modules"
